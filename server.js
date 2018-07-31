@@ -3,8 +3,12 @@
 const express = require('express');
 // const morgan = require('morgan');
 const data = require('./db/notes');
-const { PORT } = require('./config');
+const simDB = require('./db/simDB');
+const notes = simDB.initialize(data);
+
 const { myLogger } = require('./middleware/logger');
+const { PORT } = require('./config');
+
 const app = express();
 
 // app.use(morgan('dev'));
