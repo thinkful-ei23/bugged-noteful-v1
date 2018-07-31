@@ -1,11 +1,11 @@
 'use strict';
 
 const express = require('express');
-const morgan = require('morgan');
+// const morgan = require('morgan');
 const data = require('./db/notes');
 
 const app = express();
-app.use(morgan('dev'));
+// app.use(morgan('dev'));
 app.use(express.static('public'));
 
 app.get('/api/notes', (req, res) => {
