@@ -3,10 +3,14 @@
 const express = require('express');
 // const morgan = require('morgan');
 const data = require('./db/notes');
-
+const { PORT } = require('./config');
+const { myLogger } = require('./middleware/logger');
 const app = express();
+
 // app.use(morgan('dev'));
 app.use(express.static('public'));
+
+app.use(myLogger);
 
 app.get('/api/notes', (req, res) => {
   const search = req.query.searchTerm;
@@ -29,7 +33,7 @@ app.get('/api/notes/:id', (req, res) => {
 
 });
 
-app.listen(8080, function () {
+app.listen(PORT, function () {
   console.info(`Server listening on ${this.address().port}`);
 }).on('error', err => {
   console.error(err);
