@@ -4,6 +4,7 @@
 const api = {
 
   search: function (query, callback) {
+    console.log('im searching');
     $.ajax({
       type: 'GET',
       url: '/api/notes/',
