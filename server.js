@@ -12,36 +12,69 @@ const { PORT } = require('./config');
 const app = express();
 
 // app.use(morgan('dev'));
-app.use(express.static('public'));
-
 app.use(myLogger);
 
-app.get('/api/notes', (req, res) => {
-  const search = req.query.searchTerm;
-  if (search) {
-    let filteredList = data.filter(item => item.title.includes(search));
-    res.json(filteredList);
-  } else {
-    res.json(data);
+app.use(express.static('public'));
+app.use(express.json());
+
+app.get('/api/notes', (req, res, next) => {
+  const { searchTerm } = req.query;
+
+  notes.filter(searchTerm, (err, list) => {
+    if (err) {
+      return next(err); 
+    }
+    res.json(list); 
+  });
+});
+
+app.get('/api/notes/:id', (req, res, next) => {
+  const { id } = req.params; // or const id = req.params.id;
+  notes.find(id, (err, item) => {
+    if (err) {
+      return next(err);
+    }
+    if (item) {
+      res.json(item);
+    } else {
+      next();
+    }
+  });
+});
+
+app.put('/api/notes/:id', (req, res, next) => {
+  const id = req.params.id;
+  const updateObj = {};
+  const updateableFields = ['title', 'content'];
+
+  updateableFields.forEach(field => {
+    if (field in req.body) {
+      updateObj[field] = req.body[field];
+    }
+  });
+  if (!updateObj.title) {
+    const err = new Error('Missing `title` in request body');
+    err.status = 400;
+    return next(err);
   }
-  // const { searchTerm } = req.query;
-  // res.json{searchTerm ? data.filter}
+  notes.update(id, updateObj, (err,item) => {
+    if (err) {
+      return next(err);
+    }
+    if (item) {
+      res.json(item);
+    } else {
+      next();
+    }
+  });
 });
-app.get('/api/notes/:id', (req, res) => {
-  const { id } = req.params;
-
-  let note = data.find(item => item.id === Number(id));
-  res.json(note);
-
-  // res.json{data.find(item => item.id === Number(id))};
-});
-
 
 app.use(function (req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
-  res.status(404).json({ message: 'Not Found' });
+  next(err);
 });
+
 app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.json({
