@@ -1,38 +1,43 @@
 'use strict';
 
 const express = require('express');
+const morgan = require('morgan');
 
 const data = require('./db/notes');
+const simDB = require('./db/simDB');
+// const notes = simDB.initialize(data);
+
+const notesRouter = require('./router/notes.router');
+
+const { PORT } = require('./config');
 
 const app = express();
 
+app.use(morgan('dev'));
+
 app.use(express.static('public'));
+app.use(express.json());
 
-app.get('/api/notes', (req, res) => {
-  const search = req.query.searchTerm;
-  if (search) {
-    let searchResults = data.filter(item => item.title.includes(search));
-    res.json(searchResults);
-  } else {
-    res.json(data);
-  }
-});
-app.get('/api/notes/:id', (req, res) => {
-  const { id } = req.params;
-  console.log(id);
-  // let requestedData;
-  // for (let i = 0; i < data.length; i++) {
-  //   if (data[i].id === Number(id)) {
-  //     requestedData = data[i];
-  //   }
-  // }
-  const note = data.find(item => item.id === Number(id));
-  console.log(note);
-  res.json(note);
+app.use('/api', notesRouter);
+
+app.use(function (req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
 });
 
-app.listen(8080, function () {
+app.use(function (err, req, res, next) {
+  res.status(err.status || 500);
+  res.json({
+    message: err.message,
+    error: err
+  });
+});
+
+app.listen(PORT, function () {
   console.info(`Server listening on ${this.address().port}`);
 }).on('error', err => {
   console.error(err);
 });
+
+
