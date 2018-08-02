@@ -5,7 +5,7 @@ const morgan = require('morgan');
 
 const data = require('./db/notes');
 const simDB = require('./db/simDB');
-const notes = simDB.initialize(data);
+// const notes = simDB.initialize(data);
 
 const notesRouter = require('./router/notes.router');
 
