@@ -80,16 +80,17 @@ const noteful = (function () {
 
       if (noteObj.id) {
 
-        api.update(store.currentNote.id, noteObj)               .then(updateResponse => {
-          store.currentNote = updateResponse;
+        api.update(store.currentNote.id, noteObj)               
+          .then(updateResponse => {
+            store.currentNote = updateResponse;
 
-          api.search(store.currentSearchTerm)
-            .then(searchResponse => {
-              store.notes = searchResponse;
-              render();
-            });
+            api.search(store.currentSearchTerm)
+              .then(searchResponse => {
+                store.notes = searchResponse;
+                render();
+              });
 
-        });
+          });
 
       } else {
 
